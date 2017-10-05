@@ -1,0 +1,45 @@
+<div class="container ">
+    <div class="row ">
+       <div class="col-lg-3"></div>
+        <div class="col-md-4     top">
+            <div class="panel panel-default top">
+                <div class="alert alert-danger" style="background-color: #fff;" ng-show="noError==false"> <strong style="">User not found </strong>
+                </div>
+                <div class="panel-heading" style="background-color: #fff;"> <center><img src="../../js/images/logo.JPG"></center>
+                </div>
+                <div class="panel-heading " style="background-color: #41cac0;color: #fff;font-weight: 300;"> <center>SIGN IN NOW</center>
+                </div>
+                
+                <div class="panel-body">
+                    <form class="form-horizontal" name = "loginForm" ng-submit="login()" >
+                        <div class="form-group">
+                            <!-- <label for="inputEmail3" class="col-sm-3 control-label">Email</label> -->
+                            <div class="col-sm-12">
+                                <input class="form-control" id="inputEmail3" placeholder="admin" ng-model="email" required="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                           <!--  <label for="inputPassword3" class="col-sm-3 control-label">Password</label>
+                            --> <div class="col-sm-12">
+                                <input type="password" class="form-control is-sensitive" id="inputPassword3" placeholder="Password" ng-model="password" required="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class=" col-sm-12">
+                                <div class="checkbox">
+                                    <label class="">
+                                        <input type="checkbox" class="">Remember me</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class=" col-sm-12">
+                                <button type="submit" class="btn btn-lg col-sm-12" style="background-color: #f67a6e;color: #fff;box-shadow: 0 4px #e56b60;">SIGN IN</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
