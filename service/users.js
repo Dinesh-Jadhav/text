@@ -43,11 +43,15 @@ exports.addnewusers = function(crypto) {
 	       return;
 	       }else{
 	       	var record ={
-	       		name : req.body.name,
+	       		first_name : req.body.first_name,
+	       		last_name : req.body.last_name,
 	       		email: req.body.email,
+	       		user_group :req.body.user_group,
 	       		hash : crypto.createHash('sha256').update(req.body.password).digest('base64'),
 	       		mobile : req.body.mobile_number,
-	       		username : req.body.username
+	       		username : req.body.username,
+	       		image_path : req.body.image_path,
+	       		status : req.body.status
 	       	}
 	       	db.collection('users').insert(record , function(err,row){
 	       		if(err){
@@ -69,11 +73,10 @@ exports.addnewusers = function(crypto) {
  }
 }
 
+
 exports.deleteuser = function(ObjectId){
  return function(req,res){
 var result = {};
-console.log(req.body.token);
-console.log(req.session.token.token);
    if(req.body.token != req.session.token.token){
    	   result.error = true;
        result.data = " No vallide user";
@@ -117,7 +120,6 @@ var result = {};
 		    return;
 	   }else{
 		    result.error = false;
-		    console.log(row);
 		    result.data = row;
 		    res.send(JSON.stringify(result));
 		    return;
@@ -127,19 +129,24 @@ var result = {};
  }
 }
 
-
-
 exports.updatedetails = function(ObjectId){
  return function(req,res){
 var result = {};
-   if(req.headers.token != req.session.token.token){
+//console.log(req.body.token);
+   if(req.body.token != req.session.token.token){
    	   result.error = true;
        result.data = " No vallide user";
        res.send(JSON.stringify(result));
        return;
    }else {
    	  var myId = req.params.id;
-	  db.collection('users').updateOne({ "_id":ObjectId(myId)},, function(err, row) {
+   	  var newvalues = {
+   	  	name : req.body.name,
+	       		email: req.body.email,
+	       		mobile : req.body.mobile,
+	       		username : req.body.username
+   	  }
+	  db.collection('users').updateOne({ "_id":ObjectId(myId)},newvalues, function(err, row) {
 	   if (err) {
 	   	    result.error = true;
 		    result.data = " somthing going wrong";
@@ -156,8 +163,3 @@ var result = {};
    } 
  }
 }
-
-db.collection("customers").updateOne(myquery, newvalues, function(err, res) {
-    if (err) throw err;
-    console.log("1 document updated");
-    db.close();

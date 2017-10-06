@@ -12,8 +12,14 @@ var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
 var crypto = require('crypto');
 var multer = require('multer');
+var fs = require("fs");
+var path = require('path');
 //routes
 var users = require('./service/users');
+var admin = require('./service/admin');
+var upload = require('./service/upload');
+var contact = require('./service/contacts');
+
 
 app.use(express.static(__dirname + '/public')); // set the static files location /public/img will be /img for users
 app.use(session({secret: 'secret',saveUninitialized: true,resave: true}));
@@ -41,47 +47,54 @@ app.use(morgan('dev'));
 // get an instance of the router for api routes
 // ---------------------------------------------------------
 var apiRoutes = express.Router(); 
-app.post('/login',function(req,res){
-     sess=req.session;
-     var username= req.body.username;
-     var password = req.body.password;
-     var result = {};
-     if((username!=null) &&(password!=null)){
-          db.collection('admin').find({"username":username,"password":password}).toArray(function(err, row)
-         {
-            //console.log(row);
-            if ((row==null)||row.length == 0){
-             result.error = true;
-             result.data = "User not found";
-             res.send(JSON.stringify(result));
-             return;
-            }else {
-                sess.userID = row[0]._id;
-                sess.userPrivilege = 1;
-                sess.userLevel = "admin";
-                var data = {
-                  id : row[0]._id,
-                  name :row[0].username
-                }
-                result.error = false;
-                result.data = data;
-                res.send(JSON.stringify(result));
-                return;
-                }
-          });
-        }else{
-                result.error = true;
-                result.data ="Please send required information";
-                res.send(JSON.stringify(result));      
-        }
-    });
 
-app.get('/logout',function(req, res) {
-  req.session = "";
-  result = {};
-  result.error = false;
-  result.data = "Log out successfully";
-  res.send(JSON.stringify(result));
+app.post('/login',admin.login());
+app.post('/logout',admin.logout());
+//app.post('/upload',upload.upload(multer,path));
+
+//user details added by admin
+apiRoutes.get('/user/',users.getallusers());
+apiRoutes.get('/user/:id',users.getuserdetails(ObjectId));
+apiRoutes.post('/user',users.addnewusers(crypto));
+apiRoutes.delete('/user/:id',users.deleteuser(ObjectId));
+apiRoutes.put('/user/:id',users.updatedetails(ObjectId));
+apiRoutes.post('/user',users.addnewusers(crypto));
+
+//contact details by admin
+apiRoutes.get('/contact',contact.getallcontacts());
+apiRoutes.get('/contact/:id',contact.getcontactdetails(ObjectId));
+apiRoutes.post('/contact',contact.addnewcontact());
+apiRoutes.delete('/contact/:id',contact.deletecontact(ObjectId));
+apiRoutes.put('/contact/:id',contact.updatecontact(ObjectId));
+
+//apiRoutes.post('/upload',users.uploadprofile(multer));
+
+// ---------------------------------------------------------
+// route middleware to authenticate and check token
+// ---------------------------------------------------------
+var storage = multer.diskStorage({
+  destination: function(req, file, callback) {
+    callback(null, './public/images')
+  },
+  filename: function(req, file, callback) {
+    callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+  }
+})
+
+app.post('/file', function(req, res) {
+  var upload = multer({
+    storage: storage,
+    fileFilter: function(req, file, callback) {
+      var ext = path.extname(file.originalname);
+      if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+        return callback(res.end('Only images are allowed'), null)
+      }
+      callback(null, true)
+    }
+  }).single('userFile');
+  upload(req, res, function(err) {
+    res.end('File is uploaded')
+  })
 })
 
 apiRoutes.post('/authenticate', function(req, res) {
@@ -106,17 +119,6 @@ apiRoutes.post('/authenticate', function(req, res) {
       }
 });
 
-apiRoutes.get('/users',users.getallusers());
-apiRoutes.get('/users/:id',users.getuserdetails(ObjectId));
-apiRoutes.post('/user',users.addnewusers(crypto));
-apiRoutes.delete('/user/:id',users.deleteuser(ObjectId));
-apiRoutes.put('/users/:id',users.getuserdetails(ObjectId));
-//apiRoutes.post('/upload',users.uploadprofile(multer));
-
-
-// ---------------------------------------------------------
-// route middleware to authenticate and check token
-// ---------------------------------------------------------
 apiRoutes.use(function(req, res, next) {
   var token = req.body.token || req.param('token') || req.headers['x-access-token'];
   if (token) {

@@ -15,6 +15,18 @@ textApp.config(['$routeProvider',function($routeProvider){
     templateUrl:'../html/competition/add_compitation.html',
     controller:'competition_add',
     activetab:'ticker'
+    }).when('/list',{
+    templateUrl:'../html/user/userList.html',
+    controller:'userCtrl',
+    activetab:'user'
+    }).when('/contactlist',{
+    templateUrl:'../html/contact/contact.html',
+    controller:'contactCtrl',
+    activetab:'contact'
+    }).when('/addcontact',{
+    templateUrl:'../html/contact/addcontact.html',
+    controller:'contactCtrl',
+    activetab:'contact'
     }).otherwise({redirectTo:'/admin-login'});
 }]);
 

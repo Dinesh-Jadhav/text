@@ -18,7 +18,7 @@ textApp.directive('header', ['$compile', '$http', '$location', '$route', functio
             
           scope.logout = function() {
                 scope.$emit('LOAD');
-                $http.get("/logout").success(function(response, status, headers, config) {
+                $http.post("/logout").success(function(response, status, headers, config) {
                     scope.$emit('UNLOAD');
                     $location.path("/");
                 });
