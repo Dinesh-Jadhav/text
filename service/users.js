@@ -4,7 +4,7 @@ exports.getallusers = function() {
    var result = {};
    if(req.query.token != req.session.token.token){
        result.error = false;
-       result.data = " No vallide token provided";
+       result.data = " No valid token provided";
        res.send(JSON.stringify(result)); 
    }else{
    db.collection('users').find().toArray(function(err,row){
@@ -22,11 +22,11 @@ exports.addnewusers = function(crypto) {
    var result = {};
    if(req.session.token.token =="" || req.session.token.token ==undefined){
    	result.error = false;
-       result.data = " No vallide user";
+       result.data = " No valid user";
        res.send(JSON.stringify(result));
    }else if(req.body.token != req.session.token.token){
        result.error = false;
-       result.data = " No vallide token provided";
+       result.data = " No valid token provided";
        res.send(JSON.stringify(result)); 
    }else{
        db.collection('users').find({ email:req.body.email}).toArray(function(err,row){
@@ -79,7 +79,7 @@ exports.deleteuser = function(ObjectId){
 var result = {};
    if(req.body.token != req.session.token.token){
    	   result.error = true;
-       result.data = " No vallide user";
+       result.data = " No valid user";
        res.send(JSON.stringify(result));
        return;
    }else {
@@ -107,7 +107,7 @@ exports.getuserdetails = function(ObjectId){
 var result = {};
    if(req.headers.token != req.session.token.token){
    	   result.error = true;
-       result.data = " No vallide user";
+       result.data = " No valid user";
        res.send(JSON.stringify(result));
        return;
    }else {
@@ -135,7 +135,7 @@ var result = {};
 //console.log(req.body.token);
    if(req.body.token != req.session.token.token){
    	   result.error = true;
-       result.data = " No vallide user";
+       result.data = " No valid user";
        res.send(JSON.stringify(result));
        return;
    }else {

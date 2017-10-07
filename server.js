@@ -31,8 +31,9 @@ var port = process.env.PORT || 8080; // used to create, sign, and verify tokens
 mongoose.connect(config.database, function(err,database) {
     if(err) {
         console.error(err);
-     }
-    db = database; 
+     }else{
+    db = database;
+    } 
     });
 //mongoose.connect('mongodb://localhost:27017/textapp'); // connect to database
 app.set('superSecret', config.secret); // secret variable
@@ -67,8 +68,59 @@ apiRoutes.post('/contact',contact.addnewcontact());
 apiRoutes.delete('/contact/:id',contact.deletecontact(ObjectId));
 apiRoutes.put('/contact/:id',contact.updatecontact(ObjectId));
 
-//apiRoutes.post('/upload',users.uploadprofile(multer));
+//server socket io
 
+ var http = require('http');
+    var server = http.createServer(app);
+    var io = require('socket.io').listen(server);
+    var usernames = {};
+    var room = []
+    var rooms = [];
+     /*io.sockets.on('connection', function(socket) {
+       console.log('connected');
+       socket.on('addUser', function(blockID) {
+       
+       })
+   });*/
+   io.on('connection', function(socket){
+  console.log("connect")
+  socket.on('chat message', function(msg){
+    io.emit('chat message', msg);
+    console.log(msg);
+  });
+});
+/*
+    io.sockets.on('connection', function(socket) {
+        socket.on('addUser', function(blockID) {
+            // store the room name in the socket session for this client
+            socket.room = blockID;
+            // add the client's username to the global list
+            //usernames[userName] = userName;
+            // send client to room 1
+            socket.join(blockID);
+            /*socket.emit('updatechat', 'SERVER', 'You are online now !', new Date());*/
+            /*getChatHistory(blockID, function(history) {
+                io.sockets.in(blockID).emit('updatechat', history);
+                socket.broadcast.to(blockID).emit('updatechat', history);
+            });
+          *
+        });
+        // when the client emits 'sendchat', this listens and executes
+        socket.on('sendchat', function(data, block_id ) {
+            // we tell the client to execute 'updatechat' with 4 parameters
+            //addChatInDatabase(data, userName, user_id, block_id, message_by, function(history) {
+                console.log(data);
+                io.sockets.in(block_id).emit('updatechat', data);
+                socket.broadcast.to(block_id).emit('updatechat', data);
+            });
+        })
+        // when the user disconnects.. perform this
+        socket.on('disconnect', function() {
+            // remove the username from global usernames list
+            //delete usernames[socket.username];
+            socket.leave(socket.room);
+        });
+*/
 // ---------------------------------------------------------
 // route middleware to authenticate and check token
 // ---------------------------------------------------------

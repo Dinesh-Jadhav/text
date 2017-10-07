@@ -1,6 +1,6 @@
 'use strict';
 var textApp = angular.module('textApp', ['ngRoute']);
-	
+textApp.value('socketUrl', 'http://localhost:8080');
 textApp.config(['$routeProvider',function($routeProvider){
 //admin login
 	$routeProvider
