@@ -19,15 +19,42 @@ var users = require('./service/users');
 var admin = require('./service/admin');
 var upload = require('./service/upload');
 var contact = require('./service/contacts');
-
+var group = require('./service/groups');
+var port = process.env.PORT || 8080; 
+//var server = app.listen(port);
 
 app.use(express.static(__dirname + '/public')); // set the static files location /public/img will be /img for users
 app.use(session({secret: 'secret',saveUninitialized: true,resave: true}));
 // =================================================================
 // configuration ===================================================
 // =================================================================
+    var http = require('http');
+    var server = http.createServer(app);
+    var io = require('socket.io').listen(server);
+    var usernames = {};
+    var room = []
+    var rooms = [];
+    io.sockets.on('connection', function(socket) {
+      //console.log(socket);
+       socket.on('addUser', function(blockID) {
+       // store the room name in the socket session for this client
+            socket.room = blockID;
+            // send client to room 1
+            socket.join(blockID);
+            io.sockets.in(blockID).emit('updatechat');
+        });
 
-var port = process.env.PORT || 8080; // used to create, sign, and verify tokens
+       socket.on('sendchat', function(data, userName, user_id, block_id, message_by) {
+           console.log(data, userName, user_id, block_id, message_by);
+            // we tell the client to execute 'updatechat' with 4 parameters
+           /* addChatInDatabase(data, userName, user_id, block_id, message_by, function(history) {
+                console.log(data);
+                io.sockets.in(block_id).emit('updatechat', history);
+                socket.broadcast.to(block_id).emit('updatechat', history);
+     */       });
+
+        });
+// used to create, sign, and verify tokens
 mongoose.connect(config.database, function(err,database) {
     if(err) {
         console.error(err);
@@ -68,59 +95,10 @@ apiRoutes.post('/contact',contact.addnewcontact());
 apiRoutes.delete('/contact/:id',contact.deletecontact(ObjectId));
 apiRoutes.put('/contact/:id',contact.updatecontact(ObjectId));
 
-//server socket io
+//group 
 
- var http = require('http');
-    var server = http.createServer(app);
-    var io = require('socket.io').listen(server);
-    var usernames = {};
-    var room = []
-    var rooms = [];
-     /*io.sockets.on('connection', function(socket) {
-       console.log('connected');
-       socket.on('addUser', function(blockID) {
-       
-       })
-   });*/
-   io.on('connection', function(socket){
-  console.log("connect")
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
-    console.log(msg);
-  });
-});
-/*
-    io.sockets.on('connection', function(socket) {
-        socket.on('addUser', function(blockID) {
-            // store the room name in the socket session for this client
-            socket.room = blockID;
-            // add the client's username to the global list
-            //usernames[userName] = userName;
-            // send client to room 1
-            socket.join(blockID);
-            /*socket.emit('updatechat', 'SERVER', 'You are online now !', new Date());*/
-            /*getChatHistory(blockID, function(history) {
-                io.sockets.in(blockID).emit('updatechat', history);
-                socket.broadcast.to(blockID).emit('updatechat', history);
-            });
-          *
-        });
-        // when the client emits 'sendchat', this listens and executes
-        socket.on('sendchat', function(data, block_id ) {
-            // we tell the client to execute 'updatechat' with 4 parameters
-            //addChatInDatabase(data, userName, user_id, block_id, message_by, function(history) {
-                console.log(data);
-                io.sockets.in(block_id).emit('updatechat', data);
-                socket.broadcast.to(block_id).emit('updatechat', data);
-            });
-        })
-        // when the user disconnects.. perform this
-        socket.on('disconnect', function() {
-            // remove the username from global usernames list
-            //delete usernames[socket.username];
-            socket.leave(socket.room);
-        });
-*/
+apiRoutes.post('/creategroup',group.createchatroom());
+
 // ---------------------------------------------------------
 // route middleware to authenticate and check token
 // ---------------------------------------------------------
@@ -198,8 +176,14 @@ apiRoutes.use(function(req, res, next) {
 
 app.use('/api', apiRoutes);
 
+
 // =================================================================
 // start the server ================================================
 // =================================================================
-app.listen(port);
+server.listen(port);
+
+
 console.log('Magic happens at http://localhost:' + port);
+
+
+
