@@ -36,9 +36,6 @@ textApp.controller('contactCtrl',['$scope','$http','$location',function($scope,$
                             socket.emit('sendchat', message, name, userID, blockId, message_by);
                             $scope.residentchat.message = '';
                         }
-
-             
-
                         $scope.addcontact = function(){
                               console.log(contact);
                               console.log("here");

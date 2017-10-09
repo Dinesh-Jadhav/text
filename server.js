@@ -97,7 +97,8 @@ apiRoutes.put('/contact/:id',contact.updatecontact(ObjectId));
 
 //group 
 
-apiRoutes.post('/creategroup',group.createchatroom());
+apiRoutes.post('/creategroup',group.createchatroom(ObjectId));
+apiRoutes.post('/addparticipant',group.addparticipanttogrp(ObjectId));
 
 // ---------------------------------------------------------
 // route middleware to authenticate and check token
