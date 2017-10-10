@@ -3,7 +3,7 @@ exports.getallusers = function() {
 	return function(req,res){
    var result = {};
    if(req.query.token != req.session.token.token){
-       result.error = false;
+       result.error = true;
        result.data = " No valid token provided";
        res.send(JSON.stringify(result)); 
    }else{
@@ -21,11 +21,11 @@ exports.addnewusers = function(crypto) {
 	return function(req,res){
    var result = {};
    if(req.session.token.token =="" || req.session.token.token ==undefined){
-   	result.error = false;
+   	result.error = true;
        result.data = " No valid user";
        res.send(JSON.stringify(result));
    }else if(req.body.token != req.session.token.token){
-       result.error = false;
+       result.error = true;
        result.data = " No valid token provided";
        res.send(JSON.stringify(result)); 
    }else{
@@ -36,7 +36,7 @@ exports.addnewusers = function(crypto) {
 	       res.send(JSON.stringify(result));
 	       return;
        	}else{
-       	if(row.length > 1){
+       	if(row.length > 0){
 	       result.error = true;
 	       result.data = "email already exist";
 	       res.send(JSON.stringify(result));
@@ -163,3 +163,53 @@ var result = {};
    } 
  }
 }
+
+exports.login = function (crypto){
+  return function(req,res){
+     sess=req.session;
+     var username= req.body.email;
+     var password = req.body.password;
+     console.log(password);
+     var result = {};
+     if((username==null) ){
+     	result.error = true;
+             result.data = "Email id not provided";
+             res.send(JSON.stringify(result));
+             return;
+     }else if(password==null){
+     		result.error = true;
+             result.data = "Password not provided";
+             res.send(JSON.stringify(result));
+             return;
+     }else{
+          db.collection('users').find({"email":username,"hash":crypto.createHash('sha256').update(password).digest('base64')}).toArray(function(err, row)
+         {
+            if ((row==null)||row.length == 0){
+             result.error = true;
+             result.data = "User not found";
+             res.send(JSON.stringify(result));
+             return;
+            }else {
+                sess.userID = row[0]._id;
+                sess.userPrivilege = 2;
+                sess.userLevel = "User";
+                var data = {
+                  id : row[0]._id,
+                  username :row[0].username,
+                  first_name :row[0].first_name,
+                  last_name :row[0].last_name,
+                  mobile :row[0].mobile,
+                  email : row[0].email,
+                  image : row[0].image_path,
+                  user_group : row[0].user_group
+                }
+                result.error = false;
+                result.data = data;
+                res.send(JSON.stringify(result));
+                return;
+                }
+          });
+        }
+    };
+}
+

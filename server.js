@@ -20,6 +20,8 @@ var admin = require('./service/admin');
 var upload = require('./service/upload');
 var contact = require('./service/contacts');
 var group = require('./service/groups');
+var message = require('./service/message');
+
 var port = process.env.PORT || 8080; 
 //var server = app.listen(port);
 
@@ -76,19 +78,25 @@ app.use(morgan('dev'));
 // ---------------------------------------------------------
 var apiRoutes = express.Router(); 
 
+//admin
+
 app.post('/login',admin.login());
 app.post('/logout',admin.logout());
+apiRoutes.put('/admin/:id',admin.updatedetails(ObjectId));
+apiRoutes.get('/admin/:id',admin.getuserdetails(ObjectId));
 //app.post('/upload',upload.upload(multer,path));
 
 //user details added by admin
+app.post('/userlogin',users.login(crypto));
 apiRoutes.get('/user/',users.getallusers());
 apiRoutes.get('/user/:id',users.getuserdetails(ObjectId));
 apiRoutes.post('/user',users.addnewusers(crypto));
 apiRoutes.delete('/user/:id',users.deleteuser(ObjectId));
 apiRoutes.put('/user/:id',users.updatedetails(ObjectId));
-apiRoutes.post('/user',users.addnewusers(crypto));
+//apiRoutes.post('/user',users.addnewusers(crypto));
 
 //contact details by admin
+
 apiRoutes.get('/contact',contact.getallcontacts());
 apiRoutes.get('/contact/:id',contact.getcontactdetails(ObjectId));
 apiRoutes.post('/contact',contact.addnewcontact());
@@ -99,6 +107,11 @@ apiRoutes.put('/contact/:id',contact.updatecontact(ObjectId));
 
 apiRoutes.post('/creategroup',group.createchatroom(ObjectId));
 apiRoutes.post('/addparticipant',group.addparticipanttogrp(ObjectId));
+
+
+// Messages
+apiRoutes.post('/message',message.addnewusersmessage(crypto));
+apiRoutes.get('/message/:id',message.messagesbyid(ObjectId));
 
 // ---------------------------------------------------------
 // route middleware to authenticate and check token
@@ -117,14 +130,28 @@ app.post('/file', function(req, res) {
     storage: storage,
     fileFilter: function(req, file, callback) {
       var ext = path.extname(file.originalname);
-      if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
-        return callback(res.end('Only images are allowed'), null)
-      }
       callback(null, true)
     }
   }).single('userFile');
   upload(req, res, function(err) {
-    res.end('File is uploaded')
+        var result = {};
+        var fileobject = {
+        filename : req.file.filename,
+        path :req.file.path,
+        mimetype : req.file.mimetype
+      } 
+     db.collection('image').insertOne(fileobject ,function(err,row){
+     if(err){
+     result.error = true;
+     result.data = "upload fail"
+     res.send(JSON.stringify(result));
+     return;      
+       }else{
+      result.error = false;
+     result.data = fileobject;
+     res.send(JSON.stringify(result));
+     }
+    })
   })
 })
 
@@ -175,7 +202,7 @@ apiRoutes.use(function(req, res, next) {
 // authenticated routes
 // ---------------------------------------------------------
 
-app.use('/api', apiRoutes);
+app.use('/api/v1', apiRoutes);
 
 
 // =================================================================

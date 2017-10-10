@@ -25,7 +25,7 @@ exports.createchatroom = function() {
 						"addedasfreind" : req.body.addedasfreind,
 						"lastmsgsentby" : req.body.lastmsgsentby,
 						"last_msg" : req.body.last_msg,
-						"timestamp" :  new Date(Date.UTC()),
+						"timestamp" : Date.now(),
 						"userLists" : req.body.userLists,
 						"status":req.body.status
 					}
