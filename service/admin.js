@@ -128,7 +128,7 @@ var result = {};
        return;
    }else if(req.params.id == null){
        result.error = true;
-       result.data = "Admin id not provided";
+       result.data = "Id not provided";
        res.send(JSON.stringify(result));
        return;
    }else{

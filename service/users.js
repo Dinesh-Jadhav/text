@@ -28,6 +28,38 @@ exports.addnewusers = function(crypto) {
        result.error = true;
        result.data = " No valid token provided";
        res.send(JSON.stringify(result)); 
+   }else if(req.body.first_name == null){
+       result.error = true;
+       result.data = " First Name not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.last_name == null){
+       result.error = true;
+       result.data = " Last Name not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.email == null){
+        result.error = true;
+       result.data = " Email not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.mobile_number == null){
+        result.error = true;
+       result.data = " Mobile Number not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.username == null){
+        result.error = true;
+       result.data = " Username not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.password == null){
+        result.error = true;
+       result.data = "Password not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.status == null){
+        result.error = true;
+       result.data = " Status not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.image_path == null){
+        result.error = true;
+       result.data = " Image path not provided";
+       res.send(JSON.stringify(result));
    }else{
        db.collection('users').find({ email:req.body.email}).toArray(function(err,row){
        if(err){
@@ -82,6 +114,10 @@ var result = {};
        result.data = " No valid user";
        res.send(JSON.stringify(result));
        return;
+   }else if(req.params.id == null){
+       result.error = true;
+       result.data = " userID not provided";
+       res.send(JSON.stringify(result));
    }else {
       var myId = req.params.id;
 	  db.collection('users').deleteOne({ "_id":ObjectId(myId)}, function(err, obj) {
@@ -110,6 +146,10 @@ var result = {};
        result.data = " No valid user";
        res.send(JSON.stringify(result));
        return;
+   }else if(req.params.id == null){
+       result.error = true;
+       result.data = " userID not provided";
+       res.send(JSON.stringify(result));
    }else {
    	  var myId = req.params.id;
 	  db.collection('users').findOne({ "_id":ObjectId(myId)}, function(err, row) {
@@ -138,13 +178,48 @@ var result = {};
        result.data = " No valid user";
        res.send(JSON.stringify(result));
        return;
-   }else {
+   }else if(req.params.id == null){
+       result.error = true;
+       result.data = " userID not provided";
+       res.send(JSON.stringify(result));
+   }if(req.body.first_name == null){
+       result.error = true;
+       result.data = " First Name not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.last_name == null){
+       result.error = true;
+       result.data = " Last Name not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.email == null){
+        result.error = true;
+       result.data = " Email not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.mobile_number == null){
+        result.error = true;
+       result.data = " Mobile Number not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.username == null){
+        result.error = true;
+       result.data = " Username not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.status == null){
+        result.error = true;
+       result.data = " Status not provided";
+       res.send(JSON.stringify(result));
+   }else /*if(req.body.image_path == null){
+        result.error = true;
+       result.data = " Image path not provided";
+       res.send(JSON.stringify(result));
+   }else*/ {
    	  var myId = req.params.id;
    	  var newvalues = {
-   	  	name : req.body.name,
-	       		email: req.body.email,
-	       		mobile : req.body.mobile,
-	       		username : req.body.username
+   	  	first_name : req.body.first_name,
+   	  	last_name	: req.body.last_name,
+	    email: req.body.email,
+	    mobile : req.body.mobile_number,
+	    username : req.body.username,
+	    status : req.body.status,
+	    image_path : req.body.image_path
    	  }
 	  db.collection('users').updateOne({ "_id":ObjectId(myId)},newvalues, function(err, row) {
 	   if (err) {

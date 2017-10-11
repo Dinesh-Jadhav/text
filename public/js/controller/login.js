@@ -9,6 +9,10 @@ textApp.controller('login_ctrl',['$scope','$http','$location',function($scope,$h
                   $location.path("/admin-login");
             }else
             {
+                  //console.log(response.data);
+                  localStorage.setItem("admindetails",JSON.stringify(response.data));
+                  //var admindata = JSON.parse(localStorage.getItem("admindetails"));
+                 
              	$location.path("/AdminDashboard");
             }
 	});

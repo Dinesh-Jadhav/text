@@ -5,10 +5,9 @@ textApp.directive('header', ['$compile', '$http', '$location', '$route', functio
         transclude: true,
         link: function(scope, element, attrs) {
                 scope.$emit('LOAD');
-                $http.post("/api/authenticate").success(function(response, status, headers, config) {
+                $http.post("/api/v1/authenticate").success(function(response, status, headers, config) {
                     scope.$emit('UNLOAD');
                     if (response.error == false) {
-                        console.log(response);
                         localStorage.setItem("token",response.data.token);
                        // console.log(localStorage.getItem('token')); 
                     } else {

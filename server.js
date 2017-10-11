@@ -37,25 +37,89 @@ app.use(session({secret: 'secret',saveUninitialized: true,resave: true}));
     var room = []
     var rooms = [];
     io.sockets.on('connection', function(socket) {
-      //console.log(socket);
+      
        socket.on('addUser', function(blockID) {
        // store the room name in the socket session for this client
             socket.room = blockID;
-            // send client to room 1
             socket.join(blockID);
-            io.sockets.in(blockID).emit('updatechat');
+            getChatHistory(blockID, function(history) {
+                io.sockets.in(blockID).emit('updatechat', history);
+                socket.broadcast.to(blockID).emit('updatechat', history);
+            });
         });
 
        socket.on('sendchat', function(data, userName, user_id, block_id, message_by) {
            console.log(data, userName, user_id, block_id, message_by);
             // we tell the client to execute 'updatechat' with 4 parameters
-           /* addChatInDatabase(data, userName, user_id, block_id, message_by, function(history) {
-                console.log(data);
-                io.sockets.in(block_id).emit('updatechat', history);
-                socket.broadcast.to(block_id).emit('updatechat', history);
-     */       });
+           addChatInDatabase(data, userName, user_id, block_id, message_by);
+            });
+
+
+        function addChatInDatabase(data, userName, user_id, block_id) {
+        var record =
+            {
+        sender_id : user_id,
+        msg_status : "send",
+        text : data,
+        sendtimestamp :Date.now(),
+        recievetimestamp :Date.now(),
+        readtimestamp :Date.now(),
+        receiver_id : block_id,
+        chatroom_id : block_id,
+        is_deleted : 0
+          }
+          db.collection('message').insert(record , function(err,rows){
+              if(err){
+                 console.log(err); 
+              }else{
+                getChatHistory(block_id, function(rowsdata) {
+                  io.sockets.in(block_id).emit('updatechat', rowsdata);
+                  socket.broadcast.to(block_id).emit('updatechat', rowsdata);
+                });    
+              }
+            })
+          }
 
         });
+
+    function getChatHistory(block_id, callback) {
+        console.log(block_id);
+        var result = {};
+          db.collection('message').find({"chatroom_id":block_id}).toArray(function(err, rows) {
+           if (err) {
+             console.log(err);
+             callback([]);
+              }else{
+             callback(rows);
+            }
+         });
+      }
+  /*function addChatInDatabase(data, userName, user_id, block_id, callbackForInsert()) {
+        var record =
+            {
+        sender_id : user_id,
+        msg_status : "send",
+        text : data,
+        sendtimestamp :Date.now(),
+        recievetimestamp :Date.now(),
+        readtimestamp :Date.now(),
+        receiver_id : block_id,
+        chatroom_id : block_id,
+        is_deleted : 0
+          }
+          db.collection('message').insert(record , function(err,rows){
+              if(err){
+                 console.log(err); 
+              }else{
+                getChatHistory(block_id, function(rowsdata) {
+
+                  callbackForInsert(rowsdata);
+                });    
+              }
+            })
+          }*/
+
+      
 // used to create, sign, and verify tokens
 mongoose.connect(config.database, function(err,database) {
     if(err) {

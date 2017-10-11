@@ -10,6 +10,34 @@ exports.createchatroom = function() {
        result.error = true;
        result.data = " No vallide token provided";
        res.send(JSON.stringify(result)); 
+   }else if(req.body.group_icon == null){
+       result.error = true;
+       result.data = " Group Icon not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.group_name == null){
+       result.error = true;
+       result.data = " Group name not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.is_group == null){
+        result.error = true;
+       result.data = " Group status not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.lastmsgsentby == null){
+        result.error = true;
+       result.data = " Last message id not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.last_msg == null){
+        result.error = true;
+       result.data = " Last message not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.userLists == null){
+        result.error = true;
+       result.data = " Userlists not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.status == null){
+        result.error = true;
+       result.data = " Status not provided";
+       res.send(JSON.stringify(result));
    }else{
    	console.log(req.body);
    	        if(req.body.userLists.length<2){
@@ -60,6 +88,34 @@ exports.addparticipanttogrp = function(ObjectId) {
        result.error = true;
        result.data = " No vallide token provided";
        res.send(JSON.stringify(result)); 
+   }else if(req.body.user_id == null){
+       result.error = true;
+       result.data = " User id not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.mobile_number == null){
+       result.error = true;
+       result.data = " Mobile Number not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.email == null){
+        result.error = true;
+       result.data = " Email not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.last_seen == null){
+        result.error = true;
+       result.data = " Last seen not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.status == null){
+        result.error = true;
+       result.data = " status not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.last_name == null){
+        result.error = true;
+       result.data = " Last name not provided";
+       res.send(JSON.stringify(result));
+   }else if(req.body.first_name == null){
+        result.error = true;
+       result.data = " First name not provided";
+       res.send(JSON.stringify(result));
    }else{
  			var grp_id =req.body.group_id;
  			
@@ -81,7 +137,8 @@ db.collection('chatRoom').findOneAndUpdate({"_id ":ObjectId(req.body.group_id)},
 						"image" : req.body.image,
 						"last_seen" : req.body.last_seen,
 						"status" : req.body.status,
-						"name" : req.body.name
+						"first_name" : req.body.first_name,
+						"last_name" : req.body.last_name,
 					}}},{ safe: true, upsert: true }, function (err, updated) {
           if (err) {
               console.log(err)
