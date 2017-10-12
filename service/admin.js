@@ -15,7 +15,7 @@ exports.login = function (){
              res.send(JSON.stringify(result));
              return;
      }else{
-          db.collection('admin').find({"username":username,"password":password}).toArray(function(err, row)
+          db.collection('users').find({"username":username,"password":password}).toArray(function(err, row)
             {
             //console.log(row);
             if ((row==null)||row.length == 0){

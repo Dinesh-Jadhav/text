@@ -27,6 +27,10 @@ textApp.config(['$routeProvider',function($routeProvider){
     templateUrl:'../html/contact/addcontact.html',
     controller:'contactCtrl',
     activetab:'contact'
+    }).when('/groupchat',{
+    templateUrl:'../html/chat/groupchat.html',
+    controller:'grpchatCtrl',
+    activetab:'chat'
     }).otherwise({redirectTo:'/admin-login'});
 }]);
 

@@ -10,7 +10,19 @@ exports.getallusers = function() {
    db.collection('users').find().toArray(function(err,row){
       if(err) throw err;
        result.error = false;
-       result.data = row;
+       console.log(row);
+       var data = {
+          email:row[0].email,
+          first_name:row[0].first_name,
+          image:row[0].image,
+          last_name:row[0].last_name,
+          mobile:row[0].mobile,
+          status:row[0].status,
+          type:row[0].type,
+          username:row[0].username,
+          _id:row[0]._id
+       }
+       result.data = data;
        res.send(JSON.stringify(result)); 
     })
   }
@@ -56,12 +68,16 @@ exports.addnewusers = function(crypto) {
         result.error = true;
        result.data = " Status not provided";
        res.send(JSON.stringify(result));
+   }else if(req.body.type == null){
+        result.error = true;
+       result.data = " USer type not provided";
+       res.send(JSON.stringify(result));
    }else if(req.body.image_path == null){
         result.error = true;
        result.data = " Image path not provided";
        res.send(JSON.stringify(result));
    }else{
-       db.collection('users').find({ email:req.body.email}).toArray(function(err,row){
+       db.collection('users').find({ username:req.body.username}).toArray(function(err,row){
        if(err){
            result.error = true;
 	       result.data = "somthing going wrong";
@@ -70,11 +86,11 @@ exports.addnewusers = function(crypto) {
        	}else{
        	if(row.length > 0){
 	       result.error = true;
-	       result.data = "email already exist";
+	       result.data = "Username already exist";
 	       res.send(JSON.stringify(result));
 	       return;
 	       }else{
-	       	var record ={
+           	var record ={
 	       		first_name : req.body.first_name,
 	       		last_name : req.body.last_name,
 	       		email: req.body.email,
@@ -83,6 +99,7 @@ exports.addnewusers = function(crypto) {
 	       		mobile : req.body.mobile_number,
 	       		username : req.body.username,
 	       		image_path : req.body.image_path,
+            type :req.body.type,
 	       		status : req.body.status
 	       	}
 	       	db.collection('users').insert(record , function(err,row){
